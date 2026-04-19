@@ -20,7 +20,7 @@ void setup() {
   // F(__TIME__) gives the current time at the moment you clicked upload e.g. "14:32:05"
   // It is commented out because you only need to run it once to set the time
   // After setting the time comment it out again and re-upload — otherwise it resets to compile time every restart
-  // rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+   rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 }
 
 void loop() {
