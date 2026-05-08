@@ -96,14 +96,19 @@ typedef struct
 
 typedef struct
 {
-    float voltage;
+    float busVoltage;
+
+    float shuntVoltage;
+
+    float loadVoltage;
 
     float current;
+
+    float power;
 
     SensorHealth_t health;
 
 } PowerData_t;
-
 /*====================================
   ALERT STATUS
 ====================================*/
@@ -124,9 +129,6 @@ typedef struct
 
 } AlertStatus_t;
 
-/*====================================
-  GLOBAL SYSTEM DATA
-====================================*/
 
 /*====================================
   GLOBAL SYSTEM DATA

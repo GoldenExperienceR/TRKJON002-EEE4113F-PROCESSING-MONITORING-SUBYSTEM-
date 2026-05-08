@@ -11,6 +11,10 @@
 //Driver Libraries
 #include "rtc_driver.h"
 #include "sd_driver.h"
+#include "shtc3_driver.h"
+#include "mpu6050_driver.h"
+#include "ina219_driver.h"
+
 
 void setup()
 {
@@ -27,40 +31,53 @@ void setup()
     // Driver Intializations
     RTC_Init();
     SD_Init();
+    SHTC3_Init();
+    MPU6050_Init();
+    INA219_Init();
 }
 
 void loop()
 {
-    SensorManager_Update();
+    // SensorManager_Update();
 
-    AlertManager_Update();
+    // AlertManager_Update();
 
-    CommunicationManager_Update();
+    // CommunicationManager_Update();
 
-    StorageManager_Update();
+    // StorageManager_Update();
 
-    FaultManager_Update();
+    // FaultManager_Update();
 
-    StateMachine_Update();
+    // StateMachine_Update();
 
-    char timestamp[25];
+    float busVoltage;
 
-char logEntry[100];
+    float shuntVoltage;
 
-RTC_GetTimestamp(timestamp);
+    float loadVoltage;
 
-sprintf(
-    logEntry,
-    "%s,%.2f,%.2f",
-    timestamp,
-    25.4,
-    48.1
-);
+    float current;
 
-SD_WriteLogEntry(logEntry);
+    float power;
 
-Serial.println(logEntry);
+    if(INA219_ReadData(
+        &busVoltage,
+        &shuntVoltage,
+        &loadVoltage,
+        &current,
+        &power
+    ))
+    {
+        Serial.print("Load Voltage: ");
+        Serial.println(loadVoltage);
 
-delay(2000);
+        Serial.print("Current: ");
+        Serial.println(current);
+
+        Serial.print("Power: ");
+        Serial.println(power);
+    }
+
+    delay(3000);
 
 }
