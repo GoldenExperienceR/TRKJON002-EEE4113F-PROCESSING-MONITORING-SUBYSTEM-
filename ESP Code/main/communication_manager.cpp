@@ -1,6 +1,7 @@
 #include "communication_manager.h"
 
 #include "firmware_config.h"
+#include "state_machine.h"
 
 #include <Arduino.h>
 
@@ -15,10 +16,33 @@ void CommunicationManager_Update(void)
 {
     uint32_t currentTime = millis();
 
-    if(currentTime - lastTXTime >= NORMAL_TX_INTERVAL_MS)
-    {
-        lastTXTime = currentTime;
+    SystemState_t currentState = StateMachine_GetState();
 
-        Serial.println("Normal Transmission Event");
+    switch(currentState)
+    {
+        case SYS_NORMAL:
+
+            if(currentTime - lastTXTime >= NORMAL_TX_INTERVAL_MS)
+            {
+                lastTXTime = currentTime;
+
+                Serial.println("NORMAL TRANSMISSION");
+            }
+
+            break;
+
+        case SYS_ALERT:
+
+            if(currentTime - lastTXTime >= ALERT_TX_INTERVAL_MS)
+            {
+                lastTXTime = currentTime;
+
+                Serial.println("HAZARD TRANSMISSION");
+            }
+
+            break;
+
+        default:
+            break;
     }
 }

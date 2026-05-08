@@ -1,15 +1,22 @@
 #include "state_machine.h"
+
 #include <Arduino.h>
 
 static SystemState_t currentState = SYS_INIT;
 
+static uint32_t stateStartTime = 0;
+
 void StateMachine_Init(void)
 {
     currentState = SYS_INIT;
+
+    stateStartTime = millis();
 }
 
 void StateMachine_Update(void)
 {
+    uint32_t currentTime = millis();
+
     switch(currentState)
     {
         case SYS_INIT:
@@ -18,34 +25,39 @@ void StateMachine_Update(void)
 
             currentState = SYS_NORMAL;
 
+            stateStartTime = currentTime;
+
             break;
 
         case SYS_NORMAL:
 
-            Serial.println("STATE: NORMAL");
+            if(currentTime - stateStartTime >= 10000)
+            {
+                Serial.println("TRANSITION TO ALERT");
+
+                currentState = SYS_ALERT;
+
+                stateStartTime = currentTime;
+            }
 
             break;
 
         case SYS_ALERT:
 
-            Serial.println("STATE: ALERT");
+            if(currentTime - stateStartTime >= 10000)
+            {
+                Serial.println("TRANSITION TO NORMAL");
+
+                currentState = SYS_NORMAL;
+
+                stateStartTime = currentTime;
+            }
 
             break;
 
-        case SYS_ERROR:
-
-            Serial.println("STATE: ERROR");
-
-            break;
-
-        case SYS_IDLE:
-
-            Serial.println("STATE: IDLE");
-
+        default:
             break;
     }
-
-    delay(1000);
 }
 
 SystemState_t StateMachine_GetState(void)
