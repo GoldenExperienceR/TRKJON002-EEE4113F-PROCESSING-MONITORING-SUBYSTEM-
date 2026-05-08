@@ -1,12 +1,13 @@
 #include "firmware_types.h"
 #include "firmware_config.h"
-
 #include "state_machine.h"
 #include "sensor_manager.h"
 #include "alert_manager.h"
 #include "communication_manager.h"
 #include "storage_manager.h"
 #include "fault_manager.h"
+
+#include "rtc_driver.h"
 
 void setup()
 {
@@ -17,8 +18,10 @@ void setup()
     CommunicationManager_Init();
     StorageManager_Init();
     FaultManager_Init();
-
     StateMachine_Init();
+
+    // Sub-Modules
+    RTC_Init();
 }
 
 void loop()
@@ -34,4 +37,12 @@ void loop()
     FaultManager_Update();
 
     StateMachine_Update();
+
+    char timestamp[25];
+
+RTC_GetTimestamp(timestamp);
+
+Serial.println(timestamp);
+
+delay(1000);
 }
