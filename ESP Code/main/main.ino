@@ -15,6 +15,7 @@
 #include "mpu6050_driver.h"
 #include "ina219_driver.h"
 #include "ds18b20_driver.h"
+#include "ntc_driver.h"
 
 
 void setup()
@@ -36,6 +37,7 @@ void setup()
     MPU6050_Init();
     INA219_Init();
     DS18B20_Init();
+    NTC_Init();
 }
 
 void loop()
@@ -52,19 +54,24 @@ void loop()
 
     // StateMachine_Update();
 
-    float temperature;
+    float temp1;
 
-    if(DS18B20_ReadTemperature(&temperature))
-    {
-        Serial.print("Temperature: ");
+    float temp2;
 
-        Serial.println(temperature);
-    }
-    else
+    if(NTC_ReadTemperature1(&temp1))
     {
-        Serial.println("DS18B20 Read Failed");
+        Serial.print("NTC1: ");
+
+        Serial.println(temp1);
     }
 
-    delay(1000);
+    if(NTC_ReadTemperature2(&temp2))
+    {
+        Serial.print("NTC2: ");
+
+        Serial.println(temp2);
+    }
+
+    delay(2000);
 
 }
