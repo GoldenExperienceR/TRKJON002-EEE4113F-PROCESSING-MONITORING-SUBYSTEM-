@@ -1,6 +1,10 @@
 #include <math.h>  // Include math library for the log() function used in the Steinhart-Hart equation
 
 // Define which GPIO pins your thermistors are connected to
+NEW SKETCH
+
+NEW SKETCH
+
 #define NTC_PIN_1 33  // NTC thermistor 1 midpoint connects to GPIO 33
 #define NTC_PIN_2 32  // NTC thermistor 2 midpoint connects to GPIO 32
 

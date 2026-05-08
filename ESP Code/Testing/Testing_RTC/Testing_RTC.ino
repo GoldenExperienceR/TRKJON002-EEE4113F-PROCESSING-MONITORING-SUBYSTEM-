@@ -4,7 +4,7 @@
 RTC_DS3231 rtc;        // Create an RTC object called 'rtc' — this is our software handle for the DS3231 module
 
 void setup() {
-  Serial.begin(9600);  // Start serial communication at 9600 baud — note this must match your serial monitor baud rate setting
+  Serial.begin(115200);  // Start serial communication at 9600 baud — note this must match your serial monitor baud rate setting
   Wire.begin();        // Initialise the I2C bus using default pins — on ESP32 this is SDA=GPIO21 and SCL=GPIO22
 
   // Attempt to initialise communication with the DS3231 module
@@ -20,7 +20,7 @@ void setup() {
   // F(__TIME__) gives the current time at the moment you clicked upload e.g. "14:32:05"
   // It is commented out because you only need to run it once to set the time
   // After setting the time comment it out again and re-upload — otherwise it resets to compile time every restart
-   rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+   //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 }
 
 void loop() {

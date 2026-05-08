@@ -1,53 +1,32 @@
-#include <Wire.h>                 // I²C communication library
-#include <Adafruit_INA219.h>     // High-level driver for INA219
+#include <Wire.h>
+#include <Adafruit_INA219.h>
 
-// Create an INA219 object (this handles all register interactions internally)
 Adafruit_INA219 ina219;
 
-
-void setup(void) 
+void setup()
 {
-  Serial.begin(115200);          // Start serial communication for debugging
+    Serial.begin(115200);
 
-  // Some boards (e.g., Leonardo) need to wait for serial monitor to open
-  while (!Serial) {
-      delay(1);
-  }
-    
-  Serial.println("Starting INA219 Test");
-  
-  // ==============================
-  // INITIALIZE INA219 SENSOR
-  // ==============================
-  // This does multiple things internally:
-  // - Starts I²C communication
-  // - Checks if device responds at address (usually 0x40)
-  // - Writes default configuration register
-  // - Applies default calibration (32V, 2A range)
-  if (!ina219.begin()) {
-    Serial.println("Failed to find INA219 chip");
+    Serial.println("Starting INA219 Test");
 
-    // If the sensor is not detected, stop execution here
-    // This usually means:
-    // - Wiring issue
-    // - Wrong I²C address
-    // - Sensor not powered
-    while (1) { delay(10); }
-  }
+    // Explicit ESP32 I2C setup
+    Wire.begin(21, 22);
 
-  // ==============================
-  // OPTIONAL CALIBRATION SETTINGS
-  // ==============================
-  // These change measurement range and precision.
-  // Lower range = higher resolution (more precise readings)
+    // Allow bus and sensor to stabilize
+    delay(1000);
 
-  //ina219.setCalibration_32V_1A();   // Better precision for lower currents
-  //ina219.setCalibration_16V_400mA(); // Even more precise, but smaller range
+    // Force library to use configured Wire bus
+    if (!ina219.begin(&Wire))
+    {
+        Serial.println("Failed to find INA219 chip");
 
-  // If you don’t call anything → default is:
-  // setCalibration_32V_2A()
+        while (1)
+        {
+            delay(10);
+        }
+    }
 
-  Serial.println("Measuring voltage and current with INA219 ...");
+    Serial.println("INA219 Found!");
 }
 
 

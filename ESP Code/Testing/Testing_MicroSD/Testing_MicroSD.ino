@@ -65,7 +65,7 @@ void setup() {
     logFile.print(",");
     logFile.print(millis());             // Timestamp in milliseconds since boot
     logFile.print(",");
-    logFile.print(i * 3.14, 2);         // A test value — i multiplied by pi to 2 decimal places
+    logFile.print(i * 3.18, 2);         // A test value — i multiplied by pi to 2 decimal places
     logFile.print(",");
     logFile.print("test_entry_");
     logFile.println(i);                  // Message field with entry number
