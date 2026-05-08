@@ -14,6 +14,7 @@
 #include "shtc3_driver.h"
 #include "mpu6050_driver.h"
 #include "ina219_driver.h"
+#include "ds18b20_driver.h"
 
 
 void setup()
@@ -34,6 +35,7 @@ void setup()
     SHTC3_Init();
     MPU6050_Init();
     INA219_Init();
+    DS18B20_Init();
 }
 
 void loop()
@@ -50,34 +52,19 @@ void loop()
 
     // StateMachine_Update();
 
-    float busVoltage;
+    float temperature;
 
-    float shuntVoltage;
-
-    float loadVoltage;
-
-    float current;
-
-    float power;
-
-    if(INA219_ReadData(
-        &busVoltage,
-        &shuntVoltage,
-        &loadVoltage,
-        &current,
-        &power
-    ))
+    if(DS18B20_ReadTemperature(&temperature))
     {
-        Serial.print("Load Voltage: ");
-        Serial.println(loadVoltage);
+        Serial.print("Temperature: ");
 
-        Serial.print("Current: ");
-        Serial.println(current);
-
-        Serial.print("Power: ");
-        Serial.println(power);
+        Serial.println(temperature);
+    }
+    else
+    {
+        Serial.println("DS18B20 Read Failed");
     }
 
-    delay(3000);
+    delay(1000);
 
 }
