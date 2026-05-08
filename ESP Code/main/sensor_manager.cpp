@@ -1,10 +1,8 @@
 #include "sensor_manager.h"
 
-#include "firmware_config.h"
+#include "system_data.h"
 
 #include <Arduino.h>
-
-static uint32_t lastSensorPollTime = 0;
 
 void SensorManager_Init(void)
 {
@@ -13,12 +11,16 @@ void SensorManager_Init(void)
 
 void SensorManager_Update(void)
 {
-    uint32_t currentTime = millis();
+    static uint32_t lastPoll = 0;
 
-    if(currentTime - lastSensorPollTime >= SENSOR_POLL_INTERVAL_MS)
+    if(millis() - lastPoll >= 1000)
     {
-        lastSensorPollTime = currentTime;
+        lastPoll = millis();
 
-        Serial.println("Polling Sensors");
+        SystemData.environment.temperature += 1.0;
+
+        Serial.print("Temperature: ");
+
+        Serial.println(SystemData.environment.temperature);
     }
 }

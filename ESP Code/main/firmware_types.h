@@ -50,5 +50,99 @@ typedef struct
 
 } SensorHealth_t;
 
+/*====================================
+  ENVIRONMENTAL SENSOR DATA
+====================================*/
+
+typedef struct
+{
+    float temperature;
+
+    float humidity;
+
+    SensorHealth_t health;
+
+} EnvironmentalData_t;
+
+/*====================================
+  MOTION SENSOR DATA
+====================================*/
+
+typedef struct
+{
+    float accelX;
+
+    float accelY;
+
+    float accelZ;
+
+    float gyroX;
+
+    float gyroY;
+
+    float gyroZ;
+
+    float tiltAngle;
+
+    float shockMagnitude;
+
+    SensorHealth_t health;
+
+} MotionData_t;
+
+/*====================================
+  POWER SENSOR DATA
+====================================*/
+
+typedef struct
+{
+    float voltage;
+
+    float current;
+
+    SensorHealth_t health;
+
+} PowerData_t;
+
+/*====================================
+  ALERT STATUS
+====================================*/
+
+typedef struct
+{
+    bool temperatureAlert;
+
+    bool voltageAlert;
+
+    bool shockAlert;
+
+    bool tiltAlert;
+
+    bool powerStateAlert;
+
+    bool systemAlertActive;
+
+} AlertStatus_t;
+
+/*====================================
+  GLOBAL SYSTEM DATA
+====================================*/
+
+/*====================================
+  GLOBAL SYSTEM DATA
+====================================*/
+
+typedef struct
+{
+    EnvironmentalData_t environment;
+
+    MotionData_t motion;
+
+    PowerData_t battery;
+
+    AlertStatus_t alerts;
+
+} SystemData_t;
+
 
 #endif
