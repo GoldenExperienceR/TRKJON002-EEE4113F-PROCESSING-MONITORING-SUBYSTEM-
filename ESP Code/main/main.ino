@@ -16,6 +16,10 @@
 #include "ina219_driver.h"
 #include "ds18b20_driver.h"
 #include "ntc_driver.h"
+#include "uart_protocol.h"
+
+// Comm data types 
+#include "telemetry_types.h"
 
 
 void setup()
@@ -38,6 +42,7 @@ void setup()
     INA219_Init();
     DS18B20_Init();
     NTC_Init();
+    UART_PROTOCOL_Init();
 }
 
 void loop()
@@ -54,24 +59,25 @@ void loop()
 
     // StateMachine_Update();
 
-    float temp1;
+     TelemetryPacket_t telemetryData;
 
-    float temp2;
 
-    if(NTC_ReadTemperature1(&temp1))
-    {
-        Serial.print("NTC1: ");
+    telemetryData.timestamp_ms = millis();
 
-        Serial.println(temp1);
-    }
+    telemetryData.ambientTemp_C = 24.7;
+    telemetryData.humidity_percent = 58.2;
 
-    if(NTC_ReadTemperature2(&temp2))
-    {
-        Serial.print("NTC2: ");
+    telemetryData.ds18b20Temp_C = 25.1;
 
-        Serial.println(temp2);
-    }
+    telemetryData.ntc1Temp_C = 25.3;
+    telemetryData.ntc2Temp_C = 24.9;
 
-    delay(2000);
+    telemetryData.busVoltage_V = 12.1;
+    telemetryData.current_mA = 350.0;
+    telemetryData.power_mW = 4235.0;
 
+    UART_PROTOCOL_SendTelemetry(&telemetryData);
+
+    delay(1000);
 }
+
