@@ -88,8 +88,8 @@ void loop()
 
 
     UART_PROTOCOL_SendTelemetry(&telemetryData);
-    
+    //Serial.println(sizeof(TelemetryPacket_t));
 
-    delay(10000);
+    delay(5000);
 }
 

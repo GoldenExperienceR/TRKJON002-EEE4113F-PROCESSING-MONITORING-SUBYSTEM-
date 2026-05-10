@@ -1,0 +1,196 @@
+clc;
+clear;
+
+% ============================================================
+% RAW HEX PACKET FROM REALTERM
+% ============================================================
+% Paste your packet exactly as copied from RealTerm
+% MATLAB will clean it automatically
+
+rawHex = [ ...
+'AA 10 40 6D 2B 00 00 00 00 00 00 9A 99 C5 41 CD CC 68 42 CD CC C8 41 66 66 CA 41 33 33 C7 41 9A 99 41 41 00 00 AF 43 00 58 84 45 0A D7 23 3C 0A D7 A3 BC 00 00 80 3F 00 00 00 3F 9A 99 99 BE CD CC CC 3D 4D 03']; 
+
+
+
+
+% ============================================================
+% CLEAN INPUT STRING
+% ============================================================
+
+% Remove accidental non-hex characters
+rawHex = regexprep(rawHex, '[^0-9A-Fa-f ]', '');
+
+% Split into individual hex byte strings
+hexCells = strsplit(strtrim(rawHex));
+
+% Convert to uint8 byte array
+packet = uint8(hex2dec(hexCells));
+
+fprintf('Total packet bytes: %d\n\n', length(packet));
+
+% ============================================================
+% BASIC PACKET VALIDATION
+% ============================================================
+
+START_BYTE = hex2dec('AA');
+END_BYTE   = hex2dec('03');
+
+if packet(1) ~= START_BYTE
+    error('Invalid START BYTE');
+end
+
+if packet(end) ~= END_BYTE
+    error('Invalid END BYTE');
+end
+
+fprintf('START BYTE VALID\n');
+fprintf('END BYTE VALID\n\n');
+
+% ============================================================
+% EXTRACT HEADER
+% ============================================================
+
+msgType      = packet(2);
+payloadLength = packet(3);
+
+fprintf('Message Type   : 0x%02X\n', msgType);
+fprintf('Payload Length : %d bytes\n\n', payloadLength);
+
+% ============================================================
+% EXTRACT PAYLOAD
+% ============================================================
+
+payload = packet(4 : 3 + payloadLength);
+
+receivedChecksum = packet(end-1);
+
+% ============================================================
+% VERIFY CHECKSUM
+% ============================================================
+
+calculatedChecksum = uint8(0);
+
+for i = 1:length(payload)
+    calculatedChecksum = bitxor(calculatedChecksum, payload(i));
+end
+
+fprintf('Received Checksum   : 0x%02X\n', receivedChecksum);
+fprintf('Calculated Checksum : 0x%02X\n\n', calculatedChecksum);
+
+if calculatedChecksum == receivedChecksum
+    fprintf('CHECKSUM VALID\n\n');
+else
+    fprintf('CHECKSUM INVALID\n\n');
+end
+
+% ============================================================
+% TELEMETRY DECODER
+% ============================================================
+
+index = 1;
+
+% Helper functions
+readUint32 = @(bytes) typecast(uint8(bytes), 'uint32');
+readFloat  = @(bytes) typecast(uint8(bytes), 'single');
+
+% ------------------------------------------------------------
+% SYSTEM
+% ------------------------------------------------------------
+
+timestamp_ms = readUint32(payload(index:index+3));
+index = index + 4;
+
+systemHealthFlags = readUint32(payload(index:index+3));
+index = index + 4;
+
+% ------------------------------------------------------------
+% ENVIRONMENTAL
+% ------------------------------------------------------------
+
+ambientTemp_C = readFloat(payload(index:index+3));
+index = index + 4;
+
+humidity_percent = readFloat(payload(index:index+3));
+index = index + 4;
+
+% ------------------------------------------------------------
+% THERMAL
+% ------------------------------------------------------------
+
+ds18b20Temp_C = readFloat(payload(index:index+3));
+index = index + 4;
+
+ntc1Temp_C = readFloat(payload(index:index+3));
+index = index + 4;
+
+ntc2Temp_C = readFloat(payload(index:index+3));
+index = index + 4;
+
+% ------------------------------------------------------------
+% POWER
+% ------------------------------------------------------------
+
+busVoltage_V = readFloat(payload(index:index+3));
+index = index + 4;
+
+current_mA = readFloat(payload(index:index+3));
+index = index + 4;
+
+power_mW = readFloat(payload(index:index+3));
+index = index + 4;
+
+% ------------------------------------------------------------
+% IMU ACCEL
+% ------------------------------------------------------------
+
+accelX_g = readFloat(payload(index:index+3));
+index = index + 4;
+
+accelY_g = readFloat(payload(index:index+3));
+index = index + 4;
+
+accelZ_g = readFloat(payload(index:index+3));
+index = index + 4;
+
+% ------------------------------------------------------------
+% IMU GYRO
+% ------------------------------------------------------------
+
+gyroX_dps = readFloat(payload(index:index+3));
+index = index + 4;
+
+gyroY_dps = readFloat(payload(index:index+3));
+index = index + 4;
+
+gyroZ_dps = readFloat(payload(index:index+3));
+index = index + 4;
+
+% ============================================================
+% DISPLAY RESULTS
+% ============================================================
+
+fprintf('==================================================\n');
+fprintf('DECODED TELEMETRY\n');
+fprintf('==================================================\n\n');
+
+fprintf('Timestamp             : %u ms\n', timestamp_ms);
+fprintf('Health Flags          : 0x%08X\n\n', systemHealthFlags);
+
+fprintf('Ambient Temp          : %.2f C\n', ambientTemp_C);
+fprintf('Humidity              : %.2f %%\n\n', humidity_percent);
+
+fprintf('DS18B20 Temp          : %.2f C\n', ds18b20Temp_C);
+fprintf('NTC1 Temp             : %.2f C\n', ntc1Temp_C);
+fprintf('NTC2 Temp             : %.2f C\n\n', ntc2Temp_C);
+
+fprintf('Bus Voltage           : %.2f V\n', busVoltage_V);
+fprintf('Current               : %.2f mA\n', current_mA);
+fprintf('Power                 : %.2f mW\n\n', power_mW);
+
+fprintf('Accel X               : %.3f g\n', accelX_g);
+fprintf('Accel Y               : %.3f g\n', accelY_g);
+fprintf('Accel Z               : %.3f g\n\n', accelZ_g);
+
+fprintf('Gyro X                : %.3f dps\n', gyroX_dps);
+fprintf('Gyro Y                : %.3f dps\n', gyroY_dps);
+fprintf('Gyro Z                : %.3f dps\n\n', gyroZ_dps);
