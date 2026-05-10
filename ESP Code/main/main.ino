@@ -18,7 +18,7 @@
 #include "ntc_driver.h"
 #include "uart_protocol.h"
 
-// Comm data types 
+// Telemetry Struct 
 #include "telemetry_types.h"
 
 
@@ -59,7 +59,7 @@ void loop()
 
     // StateMachine_Update();
 
-     TelemetryPacket_t telemetryData;
+    TelemetryPacket_t telemetryData = {0}; // Want to intialise all values to zero
 
 
     telemetryData.timestamp_ms = millis();
@@ -76,8 +76,20 @@ void loop()
     telemetryData.current_mA = 350.0;
     telemetryData.power_mW = 4235.0;
 
-    UART_PROTOCOL_SendTelemetry(&telemetryData);
+    telemetryData.systemHealthFlags = 0;
 
-    delay(1000);
+    telemetryData.accelX_g = 0.01;
+    telemetryData.accelY_g = -0.02;
+    telemetryData.accelZ_g = 1.00;
+
+    telemetryData.gyroX_dps = 0.5;
+    telemetryData.gyroY_dps = -0.3;
+    telemetryData.gyroZ_dps = 0.1;
+
+
+    UART_PROTOCOL_SendTelemetry(&telemetryData);
+    
+
+    delay(10000);
 }
 

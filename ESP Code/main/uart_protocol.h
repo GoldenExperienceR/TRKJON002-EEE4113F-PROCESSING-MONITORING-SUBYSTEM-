@@ -11,7 +11,10 @@
 #define MSG_NACK       0x04
 #define MSG_TELEMETRY  0x10
 
-#define MAX_PAYLOAD_SIZE 32
+#define MAX_PAYLOAD_SIZE 128
+// Estimated Packet Size: 
+// 2 × uint32_t = 8 bytes
+// 13 × float = 52 bytes
 
 typedef struct
 {
@@ -23,11 +26,11 @@ typedef struct
 
 void UART_PROTOCOL_Init(void);
 
-uint8_t UART_PROTOCOL_CalculateChecksum(uint8_t* payload,
+uint8_t UART_PROTOCOL_CalculateChecksum(const uint8_t* payload,
                                         uint8_t length);
 
 void UART_PROTOCOL_SendPacket(uint8_t msgType,
-                              uint8_t* payload,
+                              const uint8_t* payload,
                               uint8_t length);
 
 bool UART_PROTOCOL_ReadPacket(UARTPacket_t* packet);

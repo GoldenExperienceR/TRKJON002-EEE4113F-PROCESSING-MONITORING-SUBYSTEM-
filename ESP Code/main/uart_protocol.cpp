@@ -6,7 +6,7 @@ void UART_PROTOCOL_Init(void)
     UART_HAL_Init();
 }
 
-uint8_t UART_PROTOCOL_CalculateChecksum(uint8_t* payload,
+uint8_t UART_PROTOCOL_CalculateChecksum(const uint8_t* payload,
                                         uint8_t length)
 {
     uint8_t checksum = 0;
@@ -20,7 +20,7 @@ uint8_t UART_PROTOCOL_CalculateChecksum(uint8_t* payload,
 }
 
 void UART_PROTOCOL_SendPacket(uint8_t msgType,
-                              uint8_t* payload,
+                              const uint8_t* payload,
                               uint8_t length)
 {
     uint8_t checksum =
@@ -41,7 +41,7 @@ void UART_PROTOCOL_SendPacket(uint8_t msgType,
 
 bool UART_PROTOCOL_ReadPacket(UARTPacket_t* packet)
 {
-    if(UART_HAL_ByteAvailable() < 5)
+    if(UART_HAL_BytesAvailable() < 5)
     {
         return false;
     }

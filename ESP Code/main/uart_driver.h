@@ -7,9 +7,9 @@ void UART_HAL_Init(void);
 
 void UART_HAL_SendByte(uint8_t byteData);
 
-void UART_HAL_SendBuffer(uint8_t* buffer, uint16_t length);
+void UART_HAL_SendBuffer(const uint8_t* buffer, uint16_t length);
 
-bool UART_HAL_ByteAvailable(void);
+uint16_t UART_HAL_BytesAvailable(void);
 
 uint8_t UART_HAL_ReadByte(void);
 
