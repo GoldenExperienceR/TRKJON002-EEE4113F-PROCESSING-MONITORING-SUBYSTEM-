@@ -22,7 +22,7 @@
 #include "telemetry_types.h"
 
 //Watchdog
-#include "watchdog_manager.h"
+//#include "watchdog_manager.h"
 
 
 
@@ -51,30 +51,16 @@ void setup()
     UART_PROTOCOL_Init();
 
     // Additional 
-    WatchdogManager_Init();
+    //WatchdogManager_Init();
 
 }
 
 void loop()
 {
-    // SensorManager_Update();
+    
 
-    // AlertManager_Update();
-
-    // CommunicationManager_Update();
-
-    // StorageManager_Update();
-
-    // FaultManager_Update();
-
-    // StateMachine_Update();
-
-    delay(2000);
-    Serial.println("After");
-    WatchdogManager_Reset();
-
-
-
+    StateMachine_Update();
+    //WatchdogManager_Reset();
 
 
      

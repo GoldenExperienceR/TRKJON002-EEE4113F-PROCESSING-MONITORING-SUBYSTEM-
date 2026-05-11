@@ -7,9 +7,17 @@
 #include "storage_manager.h"
 #include "communication_manager.h"
 #include "sensor_manager.h"
+#include "firmware_config.h"
+//#include "watchdog_manager.h"
 
 
 static SystemState_t currentState;
+static uint32_t lastIdleEntryTime = 0;
+static uint32_t idleStartTime = 0;
+
+
+
+
 
 void StateMachine_Init(void)
 {
@@ -47,24 +55,37 @@ void StateMachine_Update(void)
         // NORMAL
         // =================================================
 
+        
         case SYS_NORMAL:
+
+         SensorManager_Update();
+         AlertManager_Update(); 
+         FaultManager_Update(); 
+         CommunicationManager_Update(); 
+         StorageManager_Update();
+
+        if(FaultManager_HasCriticalFault())
         {
-            Serial.println("NORMAL");
-            if(FaultManager_HasCriticalFault())
-            {
-                currentState = SYS_ERROR;
+            Serial.println(
+                "STATE TRANSITION: NORMAL -> ERROR");
 
-                Serial.println("STATE -> ERROR");
-            }
-            else if(AlertManager_IsAlertActive())
-            {
-                currentState = SYS_ALERT;
-
-                Serial.println("STATE -> ALERT");
-            }
-
-            break;
+            currentState = SYS_ERROR;
         }
+        else if(millis() - lastIdleEntryTime >=
+                IDLE_ENTRY_INTERVAL_MS)
+        {
+            Serial.println(
+                "STATE TRANSITION: NORMAL -> IDLE");
+
+            idleStartTime = millis();
+
+            lastIdleEntryTime = millis();
+
+            currentState = SYS_IDLE;
+        }
+        
+            break;
+
 
         // =================================================
         // ALERT
@@ -72,7 +93,6 @@ void StateMachine_Update(void)
 
         case SYS_ALERT:
         {
-            Serial.println("ALERT");
             if(FaultManager_HasCriticalFault())
             {
                 currentState = SYS_ERROR;
@@ -95,7 +115,6 @@ void StateMachine_Update(void)
 
         case SYS_ERROR:
         {
-            Serial.println("ERROR");
             SensorManager_Update(); 
             CommunicationManager_Update(); 
             StorageManager_Update(); 
@@ -110,16 +129,25 @@ void StateMachine_Update(void)
         // IDLE
         // =================================================
 
+       
+       
         case SYS_IDLE:
-        {
-            Serial.println("IDLE");
 
-            currentState = SYS_NORMAL;
+           // WatchdogManager_Reset();
+            if(millis() - idleStartTime >=
+                IDLE_DURATION_MS)
+            {
+                Serial.println(
+                    "STATE TRANSITION: IDLE -> NORMAL");
 
-            Serial.println("STATE -> NORMAL");
+                currentState = SYS_NORMAL;
+            }
 
             break;
-        }
+
+
+
+
 
         default:
         {

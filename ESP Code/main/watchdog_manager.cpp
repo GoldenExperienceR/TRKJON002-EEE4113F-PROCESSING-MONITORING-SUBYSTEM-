@@ -2,8 +2,7 @@
 
 #include <Arduino.h>
 #include <esp_task_wdt.h>
-
-#define WATCHDOG_TIMEOUT_SECONDS 5
+#include "firmware_config.h"
 
 /*==================================================
 INITIALIZATION
@@ -35,6 +34,21 @@ RESET WATCHDOG
 void WatchdogManager_Reset(void)
 {
     esp_task_wdt_reset();
-    
+
 }
+
+/*==================================================
+DISABLE WATCHDOG
+==================================================*/
+
+
+void WatchdogManager_Disable(void)
+{
+    esp_task_wdt_delete(NULL);
+
+    esp_task_wdt_deinit();
+
+    Serial.println("Watchdog Disabled");
+}
+
 
