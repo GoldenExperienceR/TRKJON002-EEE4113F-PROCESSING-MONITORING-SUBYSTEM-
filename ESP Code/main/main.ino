@@ -21,10 +21,16 @@
 // Telemetry Struct 
 #include "telemetry_types.h"
 
+//Watchdog
+#include "watchdog_manager.h"
+
+
+
 
 void setup()
 {
     Serial.begin(115200);
+    Serial.println("SYSTEM BOOT");
 
     //Manager Intialisiations 
     SensorManager_Init();
@@ -43,21 +49,33 @@ void setup()
     DS18B20_Init();
     NTC_Init();
     UART_PROTOCOL_Init();
+
+    // Additional 
+    WatchdogManager_Init();
+
 }
 
 void loop()
 {
-    SensorManager_Update();
+    // SensorManager_Update();
 
-    AlertManager_Update();
+    // AlertManager_Update();
 
-    CommunicationManager_Update();
+    // CommunicationManager_Update();
 
-    StorageManager_Update();
+    // StorageManager_Update();
 
-    FaultManager_Update();
+    // FaultManager_Update();
 
-    StateMachine_Update();
+    // StateMachine_Update();
+
+    delay(2000);
+    Serial.println("After");
+    WatchdogManager_Reset();
+
+
+
+
 
      
 }
