@@ -24,6 +24,16 @@ typedef struct
 
 } UARTPacket_t;
 
+typedef enum
+{
+    UART_RESPONSE_NONE = 0,
+    UART_RESPONSE_ACK,
+    UART_RESPONSE_NACK,
+    UART_RESPONSE_TIMEOUT,
+    UART_RESPONSE_INVALID
+
+} UARTResponse_t;
+
 void UART_PROTOCOL_Init(void);
 
 uint8_t UART_PROTOCOL_CalculateChecksum(const uint8_t* payload,
@@ -41,5 +51,10 @@ void UART_PROTOCOL_SendNACK(void);
 
 void UART_PROTOCOL_SendTelemetry(
     TelemetryPacket_t* telemetryData);
+
+bool UART_PROTOCOL_WaitForACK(void);
+
+UARTResponse_t UART_PROTOCOL_WaitForResponse(
+    uint32_t timeout_ms);
 
 #endif

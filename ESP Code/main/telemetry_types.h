@@ -11,6 +11,8 @@ typedef struct
 
     uint32_t timestamp_ms;
 
+    char rtcTimestamp[32];
+
     uint32_t systemHealthFlags;
 
     // =====================================================

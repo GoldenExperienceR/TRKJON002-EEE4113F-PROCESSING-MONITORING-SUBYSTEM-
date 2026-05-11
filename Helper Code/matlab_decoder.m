@@ -8,8 +8,7 @@ clear;
 % MATLAB will clean it automatically
 
 rawHex = [ ...
-'AA 10 40 6D 2B 00 00 00 00 00 00 9A 99 C5 41 CD CC 68 42 CD CC C8 41 66 66 CA 41 33 33 C7 41 9A 99 41 41 00 00 AF 43 00 58 84 45 0A D7 23 3C 0A D7 A3 BC 00 00 80 3F 00 00 00 3F 9A 99 99 BE CD CC CC 3D 4D 03']; 
-
+'AA 10 60 B1 AD 03 00 32 30 30 30 2F 30 31 2F 30 31 20 30 30 3A 35 39 3A 31 38 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 CD CC B4 41 CD  CC 46 42 00 80 8E 41 FA 36 75 41 DA AD 6F 41 00 00 00 00 CD CC CC 3D 00 00 00 00 E1 7A 14 3F 5C 8F C2 BE 33 33 93 3F CD CC 6C 40 9A 99 01 C1 33 33 C3 41 08 03']; 
 
 
 
@@ -56,11 +55,13 @@ payloadLength = packet(3);
 fprintf('Message Type   : 0x%02X\n', msgType);
 fprintf('Payload Length : %d bytes\n\n', payloadLength);
 
+% ============================================================ 
+% EXTRACT PAYLOAD 
 % ============================================================
-% EXTRACT PAYLOAD
-% ============================================================
-
 payload = packet(4 : 3 + payloadLength);
+if length(payload) ~= payloadLength 
+    error('Payload length mismatch'); 
+end
 
 receivedChecksum = packet(end-1);
 
@@ -93,16 +94,17 @@ index = 1;
 readUint32 = @(bytes) typecast(uint8(bytes), 'uint32');
 readFloat  = @(bytes) typecast(uint8(bytes), 'single');
 
+
 % ------------------------------------------------------------
 % SYSTEM
 % ------------------------------------------------------------
 
-timestamp_ms = readUint32(payload(index:index+3));
-index = index + 4;
-
-systemHealthFlags = readUint32(payload(index:index+3));
-index = index + 4;
-
+timestamp_ms = readUint32(payload(index:index+3)); 
+index = index + 4; 
+rtcTimestamp = char(payload(index:index+31));  
+index = index + 32;
+systemHealthFlags = readUint32(payload(index:index+3)); index = index + 4;
+git status
 % ------------------------------------------------------------
 % ENVIRONMENTAL
 % ------------------------------------------------------------
@@ -174,6 +176,8 @@ fprintf('DECODED TELEMETRY\n');
 fprintf('==================================================\n\n');
 
 fprintf('Timestamp             : %u ms\n', timestamp_ms);
+fprintf('RTC Timestamp : %s\n', rtcTimestamp);
+
 fprintf('Health Flags          : 0x%08X\n\n', systemHealthFlags);
 
 fprintf('Ambient Temp          : %.2f C\n', ambientTemp_C);
@@ -194,3 +198,44 @@ fprintf('Accel Z               : %.3f g\n\n', accelZ_g);
 fprintf('Gyro X                : %.3f dps\n', gyroX_dps);
 fprintf('Gyro Y                : %.3f dps\n', gyroY_dps);
 fprintf('Gyro Z                : %.3f dps\n\n', gyroZ_dps);
+
+
+% ============================================================
+% HEALTH FLAG DECODER
+% ============================================================
+
+fprintf('==================================================\n');
+fprintf('HEALTH FLAGS\n');
+fprintf('==================================================\n\n');
+
+if bitget(systemHealthFlags, 1)
+    fprintf('DS18B20 FAULT\n');
+end
+
+if bitget(systemHealthFlags, 2)
+    fprintf('NTC1 FAULT\n');
+end
+
+if bitget(systemHealthFlags, 3)
+    fprintf('NTC2 FAULT\n');
+end
+
+if bitget(systemHealthFlags, 4)
+    fprintf('SHTC3 FAULT\n');
+end
+
+if bitget(systemHealthFlags, 5)
+    fprintf('INA219 FAULT\n');
+end
+
+if bitget(systemHealthFlags, 6)
+    fprintf('MPU6050 FAULT\n');
+end
+
+if bitget(systemHealthFlags, 7)
+    fprintf('RTC FAULT\n');
+end
+
+if systemHealthFlags == 0
+    fprintf('NO FAULTS DETECTED\n');
+end

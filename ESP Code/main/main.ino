@@ -47,49 +47,22 @@ void setup()
 
 void loop()
 {
-    // SensorManager_Update();
+    //SensorManager_Update();
 
     // AlertManager_Update();
 
-    // CommunicationManager_Update();
+     //CommunicationManager_Update();
 
     // StorageManager_Update();
 
     // FaultManager_Update();
 
-    // StateMachine_Update();
+    // StateMachine_Update();`
 
-    TelemetryPacket_t telemetryData = {0}; // Want to intialise all values to zero
+    SensorManager_Update(); 
+    UART_PROTOCOL_SendTelemetry(SensorManager_GetTelemetry()); 
+    delay(2000);
 
-
-    telemetryData.timestamp_ms = millis();
-
-    telemetryData.ambientTemp_C = 24.7;
-    telemetryData.humidity_percent = 58.2;
-
-    telemetryData.ds18b20Temp_C = 25.1;
-
-    telemetryData.ntc1Temp_C = 25.3;
-    telemetryData.ntc2Temp_C = 24.9;
-
-    telemetryData.busVoltage_V = 12.1;
-    telemetryData.current_mA = 350.0;
-    telemetryData.power_mW = 4235.0;
-
-    telemetryData.systemHealthFlags = 0;
-
-    telemetryData.accelX_g = 0.01;
-    telemetryData.accelY_g = -0.02;
-    telemetryData.accelZ_g = 1.00;
-
-    telemetryData.gyroX_dps = 0.5;
-    telemetryData.gyroY_dps = -0.3;
-    telemetryData.gyroZ_dps = 0.1;
-
-
-    UART_PROTOCOL_SendTelemetry(&telemetryData);
-    //Serial.println(sizeof(TelemetryPacket_t));
-
-    delay(5000);
+     
 }
 

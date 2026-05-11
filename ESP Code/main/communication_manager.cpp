@@ -1,11 +1,12 @@
 #include "communication_manager.h"
-
+#include "sensor_manager.h"
+#include "uart_protocol.h"
 #include "firmware_config.h"
 #include "state_machine.h"
 
 #include <Arduino.h>
 
-static uint32_t lastTXTime = 0;
+static uint32_t lastTxTime = 0;
 
 void CommunicationManager_Init(void)
 {
@@ -16,33 +17,42 @@ void CommunicationManager_Update(void)
 {
     uint32_t currentTime = millis();
 
-    SystemState_t currentState = StateMachine_GetState();
-
-    switch(currentState)
+    if (currentTime - lastTxTime >= NORMAL_TX_INTERVAL_MS)
     {
-        case SYS_NORMAL:
+        lastTxTime = currentTime;
 
-            if(currentTime - lastTXTime >= NORMAL_TX_INTERVAL_MS)
-            {
-                lastTXTime = currentTime;
+        UART_PROTOCOL_SendTelemetry(
+            SensorManager_GetTelemetry());
 
-                Serial.println("NORMAL TRANSMISSION");
-            }
+        Serial.println("Telemetry transmitted");
 
-            break;
+        UARTResponse_t response =
+            UART_PROTOCOL_WaitForResponse(5000);
 
-        case SYS_ALERT:
+        switch(response)
+        {
+            case UART_RESPONSE_ACK:
 
-            if(currentTime - lastTXTime >= ALERT_TX_INTERVAL_MS)
-            {
-                lastTXTime = currentTime;
+                Serial.println("ACK received");
+                break;
 
-                Serial.println("HAZARD TRANSMISSION");
-            }
+            case UART_RESPONSE_NACK:
 
-            break;
+                Serial.println("NACK received");
+                break;
 
-        default:
-            break;
+            case UART_RESPONSE_TIMEOUT:
+
+                Serial.println("Response timeout");
+                break;
+
+            case UART_RESPONSE_INVALID:
+
+                Serial.println("Invalid response");
+                break;
+
+            default:
+                break;
+        }
     }
 }

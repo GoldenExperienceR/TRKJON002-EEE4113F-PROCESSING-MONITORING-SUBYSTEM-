@@ -115,3 +115,55 @@ void UART_PROTOCOL_SendTelemetry(
         (uint8_t*)telemetryData,
         sizeof(TelemetryPacket_t));
 }
+
+bool UART_PROTOCOL_WaitForACK(void)
+{
+    UARTPacket_t packet;
+
+    while (1)
+    {
+        if (UART_PROTOCOL_ReadPacket(&packet))
+        {
+            if (packet.msgType == MSG_ACK)
+            {
+                if (packet.payloadLength >= 1)
+                {
+                    if (packet.payload[0] == 0x06)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+}
+UARTResponse_t UART_PROTOCOL_WaitForResponse(
+    uint32_t timeout_ms)
+{
+    UARTPacket_t packet;
+
+    uint32_t startTime = millis();
+
+    while ((millis() - startTime) < timeout_ms)
+    {
+        if (UART_PROTOCOL_ReadPacket(&packet))
+        {
+            if (packet.msgType == MSG_ACK)
+            {
+                return UART_RESPONSE_ACK;
+            }
+
+            else if (packet.msgType == MSG_NACK)
+            {
+                return UART_RESPONSE_NACK;
+            }
+
+            else
+            {
+                return UART_RESPONSE_INVALID;
+            }
+        }
+    }
+
+    return UART_RESPONSE_TIMEOUT;
+}
