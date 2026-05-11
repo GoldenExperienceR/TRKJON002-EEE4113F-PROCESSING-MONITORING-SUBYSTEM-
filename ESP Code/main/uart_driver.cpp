@@ -1,13 +1,12 @@
 #include "uart_driver.h"
 
-#define UART_BAUDRATE 115200
+#include "firmware_config.h"
+
+#include <Arduino.h>
 
 // =====================================================
-// UART MODE SELECTION 
+// UART MODE SELECTION
 // =====================================================
-
-// Uncomment for USB Serial debugging
-#define USE_USB_UART
 
 #ifdef USE_USB_UART
 
@@ -23,30 +22,28 @@
     // UART2 GPIO MODE
     // =================================================
 
-    #define UART_RX_PIN 16
-    #define UART_TX_PIN 17
-
     HardwareSerial CommsUART(2);
 
 #endif
 
 // =====================================================
-// INITIALISATION
+// INITIALIZATION
 // =====================================================
 
 void UART_HAL_Init(void)
 {
 #ifdef USE_USB_UART
 
-    CommsUART.begin(UART_BAUDRATE);
+    CommsUART.begin(UART_BAUD_RATE);
 
 #else
 
     CommsUART.begin(
-        UART_BAUDRATE,
+        UART_BAUD_RATE,
         SERIAL_8N1,
-        UART_RX_PIN,
-        UART_TX_PIN);
+        UART2_RX_PIN,
+        UART2_TX_PIN
+    );
 
 #endif
 }
@@ -87,7 +84,7 @@ uint8_t UART_HAL_ReadByte(void)
 
 void UART_HAL_Flush(void)
 {
-    while (CommsUART.available())
+    while(CommsUART.available())
     {
         CommsUART.read();
     }

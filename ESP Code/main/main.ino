@@ -47,21 +47,17 @@ void setup()
 
 void loop()
 {
-    //SensorManager_Update();
+    SensorManager_Update();
 
-    // AlertManager_Update();
+    AlertManager_Update();
 
-     //CommunicationManager_Update();
+    CommunicationManager_Update();
 
-    // StorageManager_Update();
+    StorageManager_Update();
 
-    // FaultManager_Update();
+    FaultManager_Update();
 
-    // StateMachine_Update();`
-
-    SensorManager_Update(); 
-    UART_PROTOCOL_SendTelemetry(SensorManager_GetTelemetry()); 
-    delay(2000);
+    StateMachine_Update();
 
      
 }

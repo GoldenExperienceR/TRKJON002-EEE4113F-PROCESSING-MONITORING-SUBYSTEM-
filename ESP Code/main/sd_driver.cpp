@@ -33,12 +33,52 @@ bool SD_Init(void)
         return false;
     }
 
+    // =====================================================
+    // CREATE CSV FILE WITH HEADER IF IT DOES NOT EXIST
+    // =====================================================
+
+    if(!SD.exists("/system_log.csv"))
+    {
+        File logFile =
+            SD.open("/system_log.csv", FILE_WRITE);
+
+        if(logFile)
+        {
+            logFile.println(
+                "RTC_Time,"
+                "Millis,"
+                "State,"
+                "HealthFlags,"
+                "AmbientTemp_C,"
+                "Humidity_percent,"
+                "DS18B20Temp_C,"
+                "NTC1Temp_C,"
+                "NTC2Temp_C,"
+                "BusVoltage_V,"
+                "Current_mA,"
+                "Power_mW,"
+                "AccelX_g,"
+                "AccelY_g,"
+                "AccelZ_g,"
+                "GyroX_dps,"
+                "GyroY_dps,"
+                "GyroZ_dps"
+            );
+
+            logFile.close();
+
+            Serial.println("CSV Header Created");
+        }
+    }
+
     Serial.println("SD Card Initialized");
 
     sdInitialized = true;
 
     return true;
 }
+
+
 
 /*====================================
   WRITE LOG ENTRY

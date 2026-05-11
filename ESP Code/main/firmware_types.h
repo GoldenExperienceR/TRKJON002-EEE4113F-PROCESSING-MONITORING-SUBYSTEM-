@@ -17,10 +17,11 @@ typedef enum
 
 } SystemState_t;
 
+// REMOVED THE TWO STRUCTS BELOW TO REDCUE ARCTECTHERAL COMPLEXITY
 
-/*====================================
-  GENERIC STATUS CODES
-====================================*/
+// /*====================================
+//   GENERIC STATUS CODES
+// ====================================*/
 
 typedef enum
 {
@@ -34,9 +35,9 @@ typedef enum
 } FW_Status_t;
 
 
-/*====================================
-  SENSOR HEALTH
-====================================*/
+// /*====================================
+//   SENSOR HEALTH
+// ====================================*/
 
 typedef struct
 {

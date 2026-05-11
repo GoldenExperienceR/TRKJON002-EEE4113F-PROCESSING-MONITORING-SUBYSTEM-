@@ -5,4 +5,7 @@ void FaultManager_Init(void);
 
 void FaultManager_Update(void);
 
+bool FaultManager_HasCriticalFault(void);
+
 #endif
+

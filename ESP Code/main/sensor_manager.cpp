@@ -12,23 +12,7 @@
 #include <Arduino.h>
 #include <string.h>
 
-// =====================================================
-// HEALTH FLAG DEFINITIONS
-// =====================================================
 
-#define HEALTH_DS18B20_FAULT   (1 << 0)
-
-#define HEALTH_NTC1_FAULT      (1 << 1)
-
-#define HEALTH_NTC2_FAULT      (1 << 2)
-
-#define HEALTH_SHTC3_FAULT     (1 << 3)
-
-#define HEALTH_INA219_FAULT    (1 << 4)
-
-#define HEALTH_MPU6050_FAULT   (1 << 5)
-
-#define HEALTH_RTC_FAULT        (1 << 6)
 
 
 // =====================================================

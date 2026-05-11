@@ -2,61 +2,131 @@
 
 #include <Arduino.h>
 
-static SystemState_t currentState = SYS_INIT;
+#include "alert_manager.h"
+#include "fault_manager.h"
+#include "storage_manager.h"
+#include "communication_manager.h"
+#include "sensor_manager.h"
 
-static uint32_t stateStartTime = 0;
+
+static SystemState_t currentState;
 
 void StateMachine_Init(void)
 {
     currentState = SYS_INIT;
-
-    stateStartTime = millis();
 }
 
 void StateMachine_Update(void)
 {
-    uint32_t currentTime = millis();
-
     switch(currentState)
     {
-        case SYS_INIT:
+        // =================================================
+        // INIT
+        // =================================================
 
-            Serial.println("STATE: INIT");
+        case SYS_INIT:
+        {
+            Serial.println("INIT");
+            if(FaultManager_HasCriticalFault())
+            {
+                currentState = SYS_ERROR;
+
+                Serial.println("STATE -> ERROR");
+            }
+            else
+            {
+                currentState = SYS_NORMAL;
+
+                Serial.println("STATE -> NORMAL");
+            }
+
+            break;
+        }
+
+        // =================================================
+        // NORMAL
+        // =================================================
+
+        case SYS_NORMAL:
+        {
+            Serial.println("NORMAL");
+            if(FaultManager_HasCriticalFault())
+            {
+                currentState = SYS_ERROR;
+
+                Serial.println("STATE -> ERROR");
+            }
+            else if(AlertManager_IsAlertActive())
+            {
+                currentState = SYS_ALERT;
+
+                Serial.println("STATE -> ALERT");
+            }
+
+            break;
+        }
+
+        // =================================================
+        // ALERT
+        // =================================================
+
+        case SYS_ALERT:
+        {
+            Serial.println("ALERT");
+            if(FaultManager_HasCriticalFault())
+            {
+                currentState = SYS_ERROR;
+
+                Serial.println("STATE -> ERROR");
+            }
+            else if(!AlertManager_IsAlertActive())
+            {
+                currentState = SYS_NORMAL;
+
+                Serial.println("STATE -> NORMAL");
+            }
+
+            break;
+        }
+
+        // =================================================
+        // ERROR
+        // =================================================
+
+        case SYS_ERROR:
+        {
+            Serial.println("ERROR");
+            SensorManager_Update(); 
+            CommunicationManager_Update(); 
+            StorageManager_Update(); 
+            FaultManager_Update(); 
+            if(!FaultManager_HasCriticalFault()) {
+                 Serial.println( "STATE TRANSITION: ERROR -> NORMAL");
+                  currentState = SYS_NORMAL; }
+            break;
+        }
+
+        // =================================================
+        // IDLE
+        // =================================================
+
+        case SYS_IDLE:
+        {
+            Serial.println("IDLE");
 
             currentState = SYS_NORMAL;
 
-            stateStartTime = currentTime;
+            Serial.println("STATE -> NORMAL");
 
             break;
-
-        case SYS_NORMAL:
-
-            if(currentTime - stateStartTime >= 10000)
-            {
-                Serial.println("TRANSITION TO ALERT");
-
-                currentState = SYS_ALERT;
-
-                stateStartTime = currentTime;
-            }
-
-            break;
-
-        case SYS_ALERT:
-
-            if(currentTime - stateStartTime >= 10000)
-            {
-                Serial.println("TRANSITION TO NORMAL");
-
-                currentState = SYS_NORMAL;
-
-                stateStartTime = currentTime;
-            }
-
-            break;
+        }
 
         default:
+        {
+            currentState = SYS_ERROR;
+
             break;
+        }
     }
 }
 
