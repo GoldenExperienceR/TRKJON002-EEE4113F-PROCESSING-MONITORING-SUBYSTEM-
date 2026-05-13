@@ -25,11 +25,14 @@
 //#include "watchdog_manager.h"
 
 
-
+float temperature = 0.0f;
+float humidity = 0.0f;
+float temperature2 = 0.0f;
 
 void setup()
 {
     Serial.begin(115200);
+
     Serial.println("SYSTEM BOOT");
 
     //Manager Intialisiations 
@@ -53,16 +56,56 @@ void setup()
     // Additional 
     //WatchdogManager_Init();
 
+    delay(1000);
+
+    Serial.println("Initializing SHTC3...");
+
+    if (SHTC3_Init())
+    {
+        Serial.println("SHTC3 Initialization Successful");
+    }
+    else
+    {
+        Serial.println("SHTC3 Initialization Failed");
+    }
+
 }
 
 void loop()
 {
     
 
-    StateMachine_Update();
+    //StateMachine_Update();
     //WatchdogManager_Reset();
 
+ bool status = SHTC3_ReadData(&temperature, &humidity);
 
+    if (status)
+    {
+        Serial.println("----- Sensor Reading -----");
+
+        Serial.print("Temperature: ");
+        Serial.print(temperature);
+        Serial.println(" C");
+
+        Serial.print("Humidity: ");
+        Serial.print(humidity);
+        Serial.println(" %");
+
+        Serial.println();
+    }
+    else
+    {
+        Serial.println("Sensor Read Failed");
+    }
+
+    Serial.println("---Temp Sensor Check ---");
+    NTC_ReadTemperature1(&temperature2);
+    Serial.print(temperature2);
+    
+
+
+    delay(5000);
      
 }
 
