@@ -1,12 +1,16 @@
 #ifndef FIRMWARE_CONFIG_H
 #define FIRMWARE_CONFIG_H
 
+// =====================================================
+// POWER STATE MONITORING
+// =====================================================
+#define PWR_STATE_PIN 4
+
 
 // =====================================================
 // WATCH DOG TIMEOUT 
 // =====================================================
 #define WATCHDOG_TIMEOUT_SECONDS 10000
-
 
 // =====================================================
 // SLEEP MODE 
@@ -15,10 +19,6 @@
     #define IDLE_ENTRY_INTERVAL_MS    30000
 
     #define IDLE_DURATION_MS          5000
-
-
-
-
 
 // =====================================================
 // UART CONFIGURATION
@@ -35,7 +35,6 @@
 
 #define UART2_RX_PIN 16
 #define UART2_TX_PIN 17
-
 
 
 // =====================================================

@@ -27,6 +27,10 @@
 
 #define HEALTH_CRITICAL_FAULT  (1 << 9)
 
+#define HEALTH_BACKUP_POWER_ACTIVE (1 << 10)
+
+
+
 
 
 

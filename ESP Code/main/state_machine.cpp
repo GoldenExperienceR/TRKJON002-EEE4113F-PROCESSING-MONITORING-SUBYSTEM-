@@ -67,7 +67,7 @@ void StateMachine_Update(void)
         if(FaultManager_HasCriticalFault())
         {
             Serial.println(
-                "STATE TRANSITION: NORMAL -> ERROR");
+                "NORMAL -> ERROR");
 
             currentState = SYS_ERROR;
         }
@@ -75,7 +75,7 @@ void StateMachine_Update(void)
                 IDLE_ENTRY_INTERVAL_MS)
         {
             Serial.println(
-                "STATE TRANSITION: NORMAL -> IDLE");
+                "NORMAL -> IDLE");
 
             idleStartTime = millis();
 
@@ -120,7 +120,7 @@ void StateMachine_Update(void)
             StorageManager_Update(); 
             FaultManager_Update(); 
             if(!FaultManager_HasCriticalFault()) {
-                 Serial.println( "STATE TRANSITION: ERROR -> NORMAL");
+                 Serial.println( "ERROR -> NORMAL");
                   currentState = SYS_NORMAL; }
             break;
         }
@@ -138,7 +138,7 @@ void StateMachine_Update(void)
                 IDLE_DURATION_MS)
             {
                 Serial.println(
-                    "STATE TRANSITION: IDLE -> NORMAL");
+                    "IDLE -> NORMAL");
 
                 currentState = SYS_NORMAL;
             }

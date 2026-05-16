@@ -4,6 +4,9 @@
 
 #include "sensor_manager.h"
 #include "telemetry_types.h"
+#include "system_data.h"
+
+
 
 static bool criticalFaultActive = false;
 
@@ -87,6 +90,18 @@ void FaultManager_Update(void)
         Serial.println(
             "FAULT: RTC FAILURE");
     }
+
+    if(backupPowerEventTriggered)
+    {
+        backupPowerEventTriggered = false;
+
+        telemetry->systemHealthFlags|= HEALTH_BACKUP_POWER_ACTIVE;
+
+        Serial.println( "BACKUP POWER ACTIVE");
+
+    }
+
+
 
     // ==============================================
     // CRITICAL CONDITIONS

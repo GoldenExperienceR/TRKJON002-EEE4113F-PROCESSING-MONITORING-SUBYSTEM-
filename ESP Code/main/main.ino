@@ -7,6 +7,9 @@
 #include "communication_manager.h"
 #include "storage_manager.h"
 #include "fault_manager.h"
+#include "system_data.h"
+
+
 
 //Driver Libraries
 #include "rtc_driver.h"
@@ -24,15 +27,14 @@
 //Watchdog
 //#include "watchdog_manager.h"
 
+// Power state interrupt handler
+        void IRAM_ATTR PowerState_ISR(void)
+        { 
+            backupPowerEventTriggered = true;
+             Serial.println( "BACKUP POWER ACTIVE");
+            
+        }
 
-
-float accelX = 0.0f;
-float accelY = 0.0f;
-float accelZ = 0.0f;
-
-float gyroX = 0.0f;
-float gyroY = 0.0f;
-float gyroZ = 0.0f;
 
 void setup()
 {
@@ -58,70 +60,28 @@ void setup()
     NTC_Init();
     UART_PROTOCOL_Init();
 
-    // Additional 
+    // Watch Dog Timer 
     //WatchdogManager_Init();
 
-    delay(1000);
+    // Interrupt handler 
 
-    Serial.println("Initializing MPU6050...");
+        pinMode(PWR_STATE_PIN, INPUT_PULLDOWN); // internally pulls pin to ground -> default state is a stable LOW 
+        attachInterrupt(
+            digitalPinToInterrupt(PWR_STATE_PIN),
+            PowerState_ISR,
+            RISING);
 
-    if (MPU6050_Init())
-    {
-        Serial.println("MPU6050 Initialization Successful");
-    }
-    else
-    {
-        Serial.println("MPU6050 Initialization Failed");
-    }
 
+
+
+    
 }
 
 void loop()
 {
     
+    StateMachine_Update();
+    //WatchdogManager_Reset(); 
 
-    //StateMachine_Update();
-    //WatchdogManager_Reset();
-
-  bool status = MPU6050_ReadMotionData(
-        &accelX,
-        &accelY,
-        &accelZ,
-        &gyroX,
-        &gyroY,
-        &gyroZ
-    );
-
-    if (status)
-    {
-        Serial.println("===== MPU6050 Data =====");
-
-        Serial.print("Accel X: ");
-        Serial.println(accelX);
-
-        Serial.print("Accel Y: ");
-        Serial.println(accelY);
-
-        Serial.print("Accel Z: ");
-        Serial.println(accelZ);
-
-        Serial.print("Gyro X: ");
-        Serial.println(gyroX);
-
-        Serial.print("Gyro Y: ");
-        Serial.println(gyroY);
-
-        Serial.print("Gyro Z: ");
-        Serial.println(gyroZ);
-
-        Serial.println();
-    }
-    else
-    {
-        Serial.println("MPU6050 Read Failed");
-    }
-
-    delay(500);
-     
 }
 
