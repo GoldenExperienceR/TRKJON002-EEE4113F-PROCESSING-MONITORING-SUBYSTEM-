@@ -25,9 +25,14 @@
 //#include "watchdog_manager.h"
 
 
-float temperature = 0.0f;
-float humidity = 0.0f;
-float temperature2 = 0.0f;
+
+float accelX = 0.0f;
+float accelY = 0.0f;
+float accelZ = 0.0f;
+
+float gyroX = 0.0f;
+float gyroY = 0.0f;
+float gyroZ = 0.0f;
 
 void setup()
 {
@@ -58,15 +63,15 @@ void setup()
 
     delay(1000);
 
-    Serial.println("Initializing SHTC3...");
+    Serial.println("Initializing MPU6050...");
 
-    if (SHTC3_Init())
+    if (MPU6050_Init())
     {
-        Serial.println("SHTC3 Initialization Successful");
+        Serial.println("MPU6050 Initialization Successful");
     }
     else
     {
-        Serial.println("SHTC3 Initialization Failed");
+        Serial.println("MPU6050 Initialization Failed");
     }
 
 }
@@ -78,34 +83,45 @@ void loop()
     //StateMachine_Update();
     //WatchdogManager_Reset();
 
- bool status = SHTC3_ReadData(&temperature, &humidity);
+  bool status = MPU6050_ReadMotionData(
+        &accelX,
+        &accelY,
+        &accelZ,
+        &gyroX,
+        &gyroY,
+        &gyroZ
+    );
 
     if (status)
     {
-        Serial.println("----- Sensor Reading -----");
+        Serial.println("===== MPU6050 Data =====");
 
-        Serial.print("Temperature: ");
-        Serial.print(temperature);
-        Serial.println(" C");
+        Serial.print("Accel X: ");
+        Serial.println(accelX);
 
-        Serial.print("Humidity: ");
-        Serial.print(humidity);
-        Serial.println(" %");
+        Serial.print("Accel Y: ");
+        Serial.println(accelY);
+
+        Serial.print("Accel Z: ");
+        Serial.println(accelZ);
+
+        Serial.print("Gyro X: ");
+        Serial.println(gyroX);
+
+        Serial.print("Gyro Y: ");
+        Serial.println(gyroY);
+
+        Serial.print("Gyro Z: ");
+        Serial.println(gyroZ);
 
         Serial.println();
     }
     else
     {
-        Serial.println("Sensor Read Failed");
+        Serial.println("MPU6050 Read Failed");
     }
 
-    Serial.println("---Temp Sensor Check ---");
-    NTC_ReadTemperature1(&temperature2);
-    Serial.print(temperature2);
-    
-
-
-    delay(5000);
+    delay(500);
      
 }
 

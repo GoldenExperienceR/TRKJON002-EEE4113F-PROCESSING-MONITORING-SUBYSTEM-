@@ -1,25 +1,41 @@
-#include "mpu6050_driver.h"
+#include "MPU6050_Driver.h"
 
-#include <Arduino.h>
+#include <Wire.h>
+#include <Adafruit_MPU6050.h>
+#include <Adafruit_Sensor.h>
 
-static bool mpuInitialized = false;
+// =====================================================
+// MPU6050 Object
+// =====================================================
 
-/*====================================
-  INITIALIZATION
-====================================*/
+static Adafruit_MPU6050 mpu;
+
+// =====================================================
+// Public Functions
+// =====================================================
 
 bool MPU6050_Init(void)
 {
-    Serial.println("Mock MPU6050 Initialized");
+    Wire.begin(21, 22);
 
-    mpuInitialized = true;
+    if (!mpu.begin(0x68, &Wire))
+    {
+        return false;
+    }
+
+    // Accelerometer Range
+    mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
+
+    // Gyroscope Range
+    mpu.setGyroRange(MPU6050_RANGE_500_DEG);
+
+    // Low Pass Filter
+    mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
+
+    delay(100);
 
     return true;
 }
-
-/*====================================
-  READ MOTION DATA
-====================================*/
 
 bool MPU6050_ReadMotionData(
     float* accelX,
@@ -30,30 +46,43 @@ bool MPU6050_ReadMotionData(
     float* gyroZ
 )
 {
-    if(!mpuInitialized)
-    {
-        return false;
-    }
+    sensors_event_t accel;
+    sensors_event_t gyro;
+    sensors_event_t temp;
 
-    /*
-      Simulated accelerometer data
-    */
+    mpu.getEvent(
+        &accel,
+        &gyro,
+        &temp
+    );
 
-    *accelX = random(-100, 100) * 0.01;
+    // =============================================
+    // Acceleration
+    // Convert m/s^2 -> g
+    // =============================================
 
-    *accelY = random(-100, 100) * 0.01;
+    *accelX =
+        accel.acceleration.x / 9.80665f;
 
-    *accelZ = 1.0 + random(-20, 20) * 0.01;
+    *accelY =
+        accel.acceleration.y / 9.80665f;
 
-    /*
-      Simulated gyroscope data
-    */
+    *accelZ =
+        accel.acceleration.z / 9.80665f;
 
-    *gyroX = random(-300, 300) * 0.1;
+    // =============================================
+    // Gyroscope
+    // Convert rad/s -> deg/s
+    // =============================================
 
-    *gyroY = random(-300, 300) * 0.1;
+    *gyroX =
+        gyro.gyro.x * RAD_TO_DEG;
 
-    *gyroZ = random(-300, 300) * 0.1;
+    *gyroY =
+        gyro.gyro.y * RAD_TO_DEG;
+
+    *gyroZ =
+        gyro.gyro.z * RAD_TO_DEG;
 
     return true;
 }
