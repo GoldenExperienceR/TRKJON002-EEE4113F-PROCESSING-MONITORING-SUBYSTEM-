@@ -1,11 +1,21 @@
 #ifndef FIRMWARE_CONFIG_H
 #define FIRMWARE_CONFIG_H
 
+
+// =====================================================
+// HUMIDITY LEVELS 
+// =====================================================
+#define HUMIDITY_LOW_THRESHOLD_PERCENT      30.0
+
+#define HUMIDITY_HIGH_THRESHOLD_PERCENT     70.0
+
+#define HUMIDITY_HIGHEST_THRESHOLD_PERCENT  99.0
+
+
 // =====================================================
 // POWER STATE MONITORING
 // =====================================================
 #define PWR_STATE_PIN 4
-
 
 // =====================================================
 // WATCH DOG TIMEOUT 
@@ -16,9 +26,9 @@
 // SLEEP MODE 
 // =====================================================
 
-    #define IDLE_ENTRY_INTERVAL_MS    30000
+    #define IDLE_ENTRY_INTERVAL_MS    3000
 
-    #define IDLE_DURATION_MS          5000
+    #define IDLE_DURATION_MS          1000
 
 // =====================================================
 // UART CONFIGURATION
@@ -57,7 +67,7 @@
 // STORAGE
 // =====================================================
 
-#define STORAGE_LOG_INTERVAL_MS            5000
+#define STORAGE_LOG_INTERVAL_MS            1000
 
 // =====================================================
 // TEMPERATURE THRESHOLDS

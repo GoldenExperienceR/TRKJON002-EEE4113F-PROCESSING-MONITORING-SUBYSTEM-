@@ -89,7 +89,7 @@ void loop(void)
   Serial.print(current_mA);
   Serial.println(" mA");
 
-   Serial.print("Power Interal :         ");
+   Serial.print("Power Internal :         ");
   Serial.print(power_mW);
   Serial.println(" mW");
 

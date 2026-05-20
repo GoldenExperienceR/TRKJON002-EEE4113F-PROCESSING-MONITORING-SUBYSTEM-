@@ -15,7 +15,7 @@
 #include "rtc_driver.h"
 #include "sd_driver.h"
 #include "shtc3_driver.h"
-#include "mpu6050_driver.h"
+#include "imu_driver.h"
 #include "ina219_driver.h"
 #include "ds18b20_driver.h"
 #include "ntc_driver.h"
@@ -54,7 +54,7 @@ void setup()
     RTC_Init();
     SD_Init();
     SHTC3_Init();
-    MPU6050_Init();
+    IMU_Init();
     INA219_Init();
     DS18B20_Init();
     NTC_Init();
@@ -78,8 +78,7 @@ void setup()
 }
 
 void loop()
-{
-    
+{   
     StateMachine_Update();
     //WatchdogManager_Reset(); 
 

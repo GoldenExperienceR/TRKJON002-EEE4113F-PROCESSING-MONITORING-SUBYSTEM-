@@ -6,7 +6,7 @@
 #include "ntc_driver.h"
 #include "ina219_driver.h"
 #include "shtc3_driver.h"
-#include "mpu6050_driver.h"
+#include "imu_driver.h"
 #include "rtc_driver.h"
 
 #include <Arduino.h>
@@ -19,7 +19,7 @@
 // PRIVATE TELEMETRY STORAGE
 // =====================================================
 
-static TelemetryPacket_t telemetryData;
+static TelemetryPacket_t telemetryData; // Only accesible within teh sensor manager
 
 // =====================================================
 // INIT
@@ -131,10 +131,10 @@ void SensorManager_Update(void)
     }
 
     // =================================================
-    // MPU6050
+    // IMU
     // =================================================
 
-    if (MPU6050_ReadMotionData(
+    if (IMU_ReadMotionData(
         &telemetryData.accelX_g,
         &telemetryData.accelY_g,
         &telemetryData.accelZ_g,
@@ -158,5 +158,42 @@ void SensorManager_Update(void)
 TelemetryPacket_t* SensorManager_GetTelemetry(void)
 {
     return &telemetryData;
+}
+
+// =====================================================
+// SENSOR VOTING 
+// =====================================================
+
+
+bool SensorManager_TemperatureAgreementCheck(float toleranceC)
+{
+    float ds18b20Temp =
+        telemetryData.ds18b20Temp_C;
+
+    float ntc1Temp =
+        telemetryData.ntc1Temp_C;
+
+    float ntc2Temp =
+        telemetryData.ntc2Temp_C;
+
+    if(abs(ds18b20Temp - ntc1Temp) >
+        toleranceC)
+    {
+        return false;
+    }
+
+    if(abs(ds18b20Temp - ntc2Temp) >
+        toleranceC)
+    {
+        return false;
+    }
+
+    if(abs(ntc1Temp - ntc2Temp) >
+        toleranceC)
+    {
+        return false;
+    }
+
+    return true;
 }
 

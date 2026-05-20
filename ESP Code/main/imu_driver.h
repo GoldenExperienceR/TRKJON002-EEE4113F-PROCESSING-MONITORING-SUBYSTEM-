@@ -1,9 +1,11 @@
-#ifndef MPU6050_DRIVER_H
-#define MPU6050_DRIVER_H
+#ifndef IMU_DRIVER_H
+#define IMU_DRIVER_H
 
-bool MPU6050_Init(void);
+#include <Arduino.h>
 
-bool MPU6050_ReadMotionData(
+bool IMU_Init(void);
+
+bool IMU_ReadMotionData(
     float* accelX,
     float* accelY,
     float* accelZ,
