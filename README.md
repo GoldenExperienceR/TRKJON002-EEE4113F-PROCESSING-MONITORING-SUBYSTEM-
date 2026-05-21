@@ -29,7 +29,9 @@ The table below summarises firmware architecture implementation.
 | **System Layer**      | `firmware_types.h`                                        | Defines shared firmware data structures and type definitions.                                               |
 | **System Layer**      | `system_data.cpp` / `system_data.h`                       | Stores and manages globally shared system state and runtime data.                                           |
 
-The tables below give information on the statemachine impleantation seen in the apllication layer. This defines the operational logic of the entire system. 
+
+
+The tables below give information on the statemachine implementation seen in the apllication layer. This defines the operational logic of the entire system. 
 
 | State    | Description                                                                                                                                                                  |
 | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -38,6 +40,7 @@ The tables below give information on the statemachine impleantation seen in the 
 | `ALERT`  | Hazard operating state entered when threshold violations or external power alerts are detected. Polling and telemetry rates are increased while alert signalling is enabled. |
 | `ERROR`  | Fault-management state entered after critical initialization or runtime failures. Fault flags are recorded while recovery and degraded operation are evaluated.              |
 | `IDLE`   | Low-activity waiting state between scheduled tasks to reduce unnecessary processing and power consumption.                                                                   |
+
 
 | Transition | From     | To       | Condition                                                            |
 | ---------- | -------- | -------- | -------------------------------------------------------------------- |
