@@ -55,6 +55,8 @@ void UART_HAL_Init(void)
 void UART_HAL_SendByte(uint8_t byteData)
 {
     CommsUART.write(byteData);
+    // Ensures byte fully transmitted
+    CommsUART.flush();
 }
 
 void UART_HAL_SendBuffer(
@@ -62,6 +64,8 @@ void UART_HAL_SendBuffer(
     uint16_t length)
 {
     CommsUART.write(buffer, length);
+     // Wait for TX completion
+    CommsUART.flush();
 }
 
 // =====================================================

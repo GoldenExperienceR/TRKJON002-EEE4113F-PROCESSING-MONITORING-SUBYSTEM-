@@ -27,6 +27,9 @@
 //Watchdog
 //#include "watchdog_manager.h"
 
+//Communication Subsytem 
+#include "communication_firmware.h"
+
 // Power state interrupt handler
         void IRAM_ATTR PowerState_ISR(void)
         { 
@@ -35,12 +38,16 @@
             
         }
 
+// Switch for flashing the MONITORING and COMMUNCIATION ESP
+#define MONITORING_ESP
+//#define COMMUNICATION_ESP
+
 
 void setup()
 {
     Serial.begin(115200);
 
-    Serial.println("SYSTEM BOOT");
+   Serial.println("System Ready");
 
     //Manager Intialisiations 
     SensorManager_Init();
@@ -71,16 +78,24 @@ void setup()
             PowerState_ISR,
             RISING);
 
-
-
-
-    
 }
 
 void loop()
 {   
+   #ifdef MONITORING_ESP
+
     StateMachine_Update();
-    //WatchdogManager_Reset(); 
+     //WatchdogManager_Reset(); 
+
+#endif
+
+
+
+#ifdef COMMUNICATION_ESP
+
+    CommunicationLoop();
+
+#endif
 
 }
 

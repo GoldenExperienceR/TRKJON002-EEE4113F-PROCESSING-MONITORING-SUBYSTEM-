@@ -41,52 +41,112 @@ void UART_PROTOCOL_SendPacket(uint8_t msgType,
 
 bool UART_PROTOCOL_ReadPacket(UARTPacket_t* packet)
 {
-    if(UART_HAL_BytesAvailable() < 5)
+    // =====================================================
+    // WAIT FOR START BYTE
+    // =====================================================
+
+    while (UART_HAL_BytesAvailable() > 0)
     {
-        return false;
+        uint8_t byteIn = UART_HAL_ReadByte();
+
+        if (byteIn == START_BYTE)
+        {
+            // =================================================
+            // WAIT FOR HEADER
+            // =================================================
+
+            while (UART_HAL_BytesAvailable() < 2)
+            {
+                // Wait for msgType + payloadLength
+            }
+
+            packet->msgType =
+                UART_HAL_ReadByte();
+
+            packet->payloadLength =
+                UART_HAL_ReadByte();
+
+            // =================================================
+            // VALIDATE PAYLOAD LENGTH
+            // =================================================
+
+            if (packet->payloadLength >
+                MAX_PAYLOAD_SIZE)
+            {
+                UART_HAL_Flush();
+                return false;
+            }
+
+            // =================================================
+            // WAIT FOR FULL PACKET
+            // payload + checksum + end byte
+            // =================================================
+
+            while (UART_HAL_BytesAvailable() <
+                   (packet->payloadLength + 2))
+            {
+                // Wait
+            }
+
+            // =================================================
+            // READ PAYLOAD
+            // =================================================
+
+            uint8_t calculatedChecksum = 0;
+
+            for (int i = 0;
+                 i < packet->payloadLength;
+                 i++)
+            {
+                packet->payload[i] =
+                    UART_HAL_ReadByte();
+
+                calculatedChecksum ^=
+                    packet->payload[i];
+            }
+
+            // =================================================
+            // READ CHECKSUM
+            // =================================================
+
+            uint8_t receivedChecksum =
+                UART_HAL_ReadByte();
+
+            // =================================================
+            // READ END BYTE
+            // =================================================
+
+            uint8_t endByte =
+                UART_HAL_ReadByte();
+
+            // =================================================
+            // VALIDATE END BYTE
+            // =================================================
+
+            if (endByte != END_BYTE)
+            {
+                return false;
+            }
+
+            // =================================================
+            // VALIDATE CHECKSUM
+            // =================================================
+
+            if (receivedChecksum !=
+                calculatedChecksum)
+            {
+                return false;
+            }
+
+            // =================================================
+            // PACKET VALID
+            // =================================================
+
+            return true;
+        }
     }
 
-    if(UART_HAL_ReadByte() != START_BYTE)
-    {
-        return false;
-    }
-
-    packet->msgType = UART_HAL_ReadByte();
-
-    packet->payloadLength = UART_HAL_ReadByte();
-
-    if(packet->payloadLength > MAX_PAYLOAD_SIZE)
-    {
-        UART_HAL_Flush();
-        return false;
-    }
-
-    uint8_t checksum = 0;
-
-    for(int i = 0; i < packet->payloadLength; i++)
-    {
-        packet->payload[i] = UART_HAL_ReadByte();
-
-        checksum ^= packet->payload[i];
-    }
-
-    uint8_t receivedChecksum =
-        UART_HAL_ReadByte();
-
-    uint8_t endByte =
-        UART_HAL_ReadByte();
-
-    if(endByte != END_BYTE)
-    {
-        return false;
-    }
-
-    if(checksum != receivedChecksum)
-    {
-        return false;
-    }
-
-    return true;
+    return false;
 }
 
 void UART_PROTOCOL_SendACK(void)
@@ -120,7 +180,10 @@ bool UART_PROTOCOL_WaitForACK(void)
 {
     UARTPacket_t packet;
 
-    while (1)
+    uint32_t startTime = millis();
+
+    while ((millis() - startTime) < 1000)
+
     {
         if (UART_PROTOCOL_ReadPacket(&packet))
         {

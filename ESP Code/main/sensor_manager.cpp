@@ -8,6 +8,8 @@
 #include "shtc3_driver.h"
 #include "imu_driver.h"
 #include "rtc_driver.h"
+#include "firmware_config.h"
+
 
 #include <Arduino.h>
 #include <string.h>
@@ -41,6 +43,18 @@ void SensorManager_Update(void)
     telemetryData.timestamp_ms = millis();
 
     telemetryData.systemHealthFlags = 0;
+
+// =================================================
+// POWER SOURCE STATUS
+// =================================================
+
+if(digitalRead(PWR_STATE_PIN) == HIGH)
+{
+    telemetryData.systemHealthFlags |=
+        HEALTH_BACKUP_POWER_ACTIVE;
+    Serial.println("BACK UP POWER");
+    delay(100);
+}
 
     if (!RTC_GetTimestamp(telemetryData.rtcTimestamp)) { 
         telemetryData.systemHealthFlags |= HEALTH_RTC_FAULT; }
@@ -149,6 +163,8 @@ void SensorManager_Update(void)
         telemetryData.systemHealthFlags |=
             HEALTH_MPU6050_FAULT;
     }
+
+
 }
 
 // =====================================================
